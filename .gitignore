@@ -1,2 +1,4 @@
 dataset
 dlops2-key.json
+lightning_logs
+logs
