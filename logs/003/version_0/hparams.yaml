@@ -1,0 +1,12 @@
+datamodule:
+  path: !!python/object/apply:pathlib.WindowsPath
+  - dataset
+  batch_size: 25
+trainer:
+  max_epochs: 10
+  enable_checkpointing: false
+  overfit_batches: 0
+logger: CSVLogger
+logger_params:
+  save_dir: logs
+  name: '003'

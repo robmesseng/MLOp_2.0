@@ -11,17 +11,22 @@ config = {
         'batch_size': 25
     },
     'trainer': {
-        'max_epochs': 10,
-        'logger': None,
+        'max_epochs': 10,        
         'enable_checkpointing': False,
         'overfit_batches': 0
-    }
+    },
+    'logger': None,
 }
 
 
 def train(config):
     dm = MNISTDataModule(**config['datamodule'])
-    module = MNISTModule()
+    module = MNISTModule(config)
+    # Logger config
+    if config['logger'] is not None:
+        config['trainer']['logger'] = getattr(pl.loggers, config['logger'])(
+            **config['logger_params']
+        )
     trainer = pl.Trainer(**config['trainer'])
     trainer.fit(module, dm)
     trainer.save_checkpoint('final.ckpt')
