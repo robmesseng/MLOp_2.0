@@ -3,7 +3,7 @@ from pathlib import Path
 import pytorch_lightning as pl
 import yaml
 import sys
-
+import importlib
 
 config = {
     'datamodule': {
@@ -16,6 +16,7 @@ config = {
         'overfit_batches': 0
     },
     'logger': None,
+    'callbacks': None,
 }
 
 
@@ -24,9 +25,24 @@ def train(config):
     module = MNISTModule(config)
     # Logger config
     if config['logger'] is not None:
-        config['trainer']['logger'] = getattr(pl.loggers, config['logger'])(
-            **config['logger_params']
-        )
+        if config['logger'] == 'WandbLogger':
+            config['trainer']['logger'] = getattr(pl.loggers, config['logger'])(
+                **config['logger_params'], config=config)
+        else:
+            config['trainer']['logger'] = getattr(
+                pl.loggers, config['logger'])(**config['logger_params'])    
+    # Callbacks config
+    if config['callbacks'] is not None:
+        callbacks = []
+        for callback in config['callbacks']:
+            if callback['name'] == 'WandBCallback':
+                dm.setup()
+                callback['params']['dl'] = dm.val_dataloader()
+            cb = getattr(importlib.import_module(callback['lib']), callback['name'])(
+                **callback['params'])
+            callbacks.append(cb)
+            config['trainer']['callbacks'] = callbacks            
+    # Train    
     trainer = pl.Trainer(**config['trainer'])
     trainer.fit(module, dm)
     trainer.save_checkpoint('final.ckpt')
