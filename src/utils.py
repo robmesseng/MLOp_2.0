@@ -28,7 +28,7 @@ class WandBCallback(Callback):
             y_hat = pl_module(img.to(pl_module.device))
         return y_hat, label
     
-    def on_epoch_end(self, trainer, pl_module):
+    def on_validation_epoch_end(self, trainer, pl_module):
         preds = torch.tensor([], device=pl_module.device)
         y = torch.tensor([])
         pl_module.eval()
