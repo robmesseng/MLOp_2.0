@@ -19,7 +19,9 @@ with torch.no_grad():
 
 acc = (preds == labels).float().mean()
 
-print(acc.item())
+print(acc.item()), print(module.hparams)
+
+wandb.finish()
 
 
 
